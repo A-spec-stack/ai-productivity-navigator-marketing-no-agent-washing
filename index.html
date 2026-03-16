@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Productivity Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-serif: "Playfair Display", serif;
+      --font-sans: "Lato", sans-serif;
+      --color-primary: #007C91;
+      --color-bg: #EDE6DB;
+      --color-card: #FFFFFF;
+      --color-text-primary: #2E2E2E;
+      --color-text-secondary: #6F6F6F;
+      --color-text-tertiary: #9A9A9A;
+      --color-border-tertiary: #D8D2C8;
+      --color-border-secondary: #C4BDB2;
+      --color-background-primary: #FFFFFF;
+      --color-background-secondary: #F7F4EF;
+      --border-radius-md: 10px;
+      --border-radius-lg: 18px;
+    }
+ 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      padding: 60px;
+      line-height: 1.6;
+    }
+ 
+    .nav {
+      max-width: 1000px;
+      margin: auto;
+    }
+ 
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 48px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      display: inline-block;
+      background: #D8D2C8;
+      padding: 8px 18px;
+      margin-bottom: 16px;
+    }
+ 
+    .sub {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+ 
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+ 
+    .tab {
+      padding: 9px 20px;
+      border-radius: 24px;
+      border: 1px solid var(--color-border-tertiary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--color-background-primary);
+      color: var(--color-text-secondary);
+      transition: all .15s;
+    }
+ 
+    .tab.active {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+ 
+    .tab:hover:not(.active) {
+      background: var(--color-background-secondary);
+    }
+ 
+    /* ── Card ── */
+    .card {
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 36px;
+      background: var(--color-card);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+    }
+ 
+    .phase-label {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--color-text-primary);
+    }
+ 
+    .cluster {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+    }
+ 
+    .cluster strong {
+      color: var(--color-text-primary);
+    }
+ 
+    .impact-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+ 
+    .impact-label {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+ 
+    .impact-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+ 
+    .impact-vh {
+      background: #E6F2F4;
+      color: #005C6A;
+    }
+ 
+    .impact-h {
+      background: #F2E9DA;
+      color: #7A5A1C;
+    }
+ 
+    .divider {
+      border: none;
+      border-top: 1px solid var(--color-border-tertiary);
+      margin: 20px 0;
+    }
+ 
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+ 
+    /* ── Task tags ── */
+    .tasks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+ 
+    .task-tag {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      background: var(--color-background-secondary);
+      border-radius: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--color-border-tertiary);
+    }
+ 
+    /* ── Use-case tags ── */
+    .use-cases {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+ 
+    .uc-tag {
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--color-border-tertiary);
+      background: var(--color-background-primary);
+      color: var(--color-text-secondary);
+      cursor: default;
+    }
+ 
+    .uc-tag.tool {
+      border-color: #8AA9B0;
+      background: #F4F8F9;
+      color: #2E5F69;
+    }
+ 
+    .uc-tag.agent {
+      border-color: var(--color-primary);
+      background: #E6F2F4;
+      color: var(--color-primary);
+    }
+ 
+    /* ── Gain cards ── */
+    .gains {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+ 
+    .gain-item {
+      background: var(--color-background-secondary);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--color-border-tertiary);
+    }
+ 
+    .gain-num {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--color-primary);
+      line-height: 1.2;
+    }
+ 
+    .gain-desc {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+    }
+ 
+    .gain-src {
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      margin-top: 4px;
+    }
+ 
+    /* ── Agent block ── */
+    .agent-block {
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 16px;
+      margin-top: 4px;
+      background: var(--color-background-secondary);
+    }
+ 
+    .agent-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--color-text-secondary);
+      margin-bottom: 10px;
+    }
+ 
+    .agent-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+ 
+    .agent-row:last-child {
+      border-bottom: none;
+    }
+ 
+    .agent-name {
+      font-size: 13px;
+      color: var(--color-text-primary);
+    }
+ 
+    .agent-verdict {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 10px;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+ 
+    .av-auto   { background: #E6F2F4; color: #005C6A; }
+    .av-copilot { background: #F2E9DA; color: #7A5A1C; }
+    .av-hype   { background: #FAEAEA; color: #8B2424; }
+ 
+    /* ── Confidence slider ── */
+    .confidence-block { margin-top: 4px; }
+ 
+    .conf-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+ 
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+ 
+    .conf-out {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 6px;
+      min-height: 18px;
+    }
+ 
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border-tertiary);
+    }
+ 
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+ 
+    .leg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+ 
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      body { padding: 24px 16px; }
+      h2 { font-size: 30px; }
+      .card { padding: 20px; }
+      .gains { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+ 
+<div class="nav">
+  <h2>AI Productivity Navigator</h2>
+  <p class="sub">
+    Wo KI im Marketing wirklich Zeit spart — mit Einordnung: Automation, Copilot oder echter Agent?<br>
+    Quellenbasiert · CoSchedule · Sopro · McKinsey · Gartner · Salesforce Research · März 2026
+  </p>
+ 
+  <div class="tabs">
+    <button class="tab active" onclick="show('awareness', this)">Awareness</button>
+    <button class="tab" onclick="show('consideration', this)">Consideration</button>
+    <button class="tab" onclick="show('purchase', this)">Purchase</button>
+    <button class="tab" onclick="show('loyalty', this)">Loyalty</button>
+  </div>
+ 
+  <!-- ── AWARENESS ── -->
+  <div id="awareness" class="phase">
+    <div class="card">
+      <div class="phase-label">Awareness</div>
+      <div class="cluster">Cluster: <strong>Content Production &amp; Campaign Creation</strong></div>
+      <div class="impact-row">
+        <span class="impact-label">Impact Level:</span>
+        <span class="impact-badge impact-vh">Very High</span>
+      </div>
+      <hr class="divider">
+ 
+      <div class="section-title">Typische Aufgaben</div>
+      <div class="tasks">
+        <span class="task-tag">Blog-Artikel</span>
+        <span class="task-tag">LinkedIn Posts</span>
+        <span class="task-tag">Whitepapers</span>
+        <span class="task-tag">Ad Copy</span>
+        <span class="task-tag">Landing Pages</span>
+        <span class="task-tag">SEO-Content</span>
+      </div>
+ 
+      <div class="section-title">KI Use Cases &mdash; <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--color-text-secondary)">Farbe = ehrliche Einordnung</span></div>
+      <div class="use-cases">
+        <span class="uc-tag tool">Content Draft Generation</span>
+        <span class="uc-tag tool">Headline A/B Variants</span>
+        <span class="uc-tag tool">Ad Creative Generation</span>
+        <span class="uc-tag tool">SEO-Briefing Automation</span>
+        <span class="uc-tag agent">Meta Advantage+ Targeting</span>
+        <span class="uc-tag agent">Google PMax Bidding</span>
+      </div>
+ 
+      <div class="section-title">Belegte Produktivitätsgewinne</div>
+      <div class="gains">
+        <div class="gain-item">
+          <div class="gain-num">3–5×</div>
+          <div class="gain-desc">schnellere Content-Produktion</div>
+          <div class="gain-src">CoSchedule State of AI Marketing, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">93%</div>
+          <div class="gain-desc">schnellere Erstellung (mit Mensch in der Schleife)</div>
+          <div class="gain-src">Straits Research, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">+22%</div>
+          <div class="gain-desc">ROAS bei Meta Advantage+ vs. manuell</div>
+          <div class="gain-src">Meta Earnings Q4 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">11 h/Wo</div>
+          <div class="gain-desc">gesparte Zeit pro Marketer im Schnitt</div>
+          <div class="gain-src">ZoomInfo / Sopro, 2025</div>
+        </div>
+      </div>
+ 
+      <hr class="divider">
+      <div class="agent-block">
+        <div class="agent-title">Was steckt wirklich dahinter?</div>
+        <div class="agent-row">
+          <span class="agent-name">ChatGPT / Claude als Drafting-Tool</span>
+          <span class="agent-verdict av-copilot">Copilot</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Meta Advantage+ / GEM</span>
+          <span class="agent-verdict av-auto">Echter Agent (enger Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Google PMax</span>
+          <span class="agent-verdict av-auto">Echter Agent (enger Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">„KI Content Agent" (Jasper etc.)</span>
+          <span class="agent-verdict av-copilot">Automation + GenAI</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">„Autonome Kampagne" (Marketingsprache)</span>
+          <span class="agent-verdict av-hype">Agentwashing</span>
+        </div>
+      </div>
+ 
+      <div class="confidence-block">
+        <hr class="divider">
+        <div class="section-title">Agent Confidence — Wie autonom wollen Sie delegieren?</div>
+        <div class="conf-label">Verschieben Sie den Regler: Was sollte KI allein entscheiden dürfen?</div>
+        <input type="range" min="0" max="100" value="40" oninput="updateConf(this.value, 'a-conf')">
+        <div class="conf-out" id="a-conf">40% — Empfehlung: KI entwirft, Mensch genehmigt</div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── CONSIDERATION ── -->
+  <div id="consideration" class="phase" style="display:none">
+    <div class="card">
+      <div class="phase-label">Consideration</div>
+      <div class="cluster">Cluster: <strong>Lead Nurturing &amp; Personalisierung</strong></div>
+      <div class="impact-row">
+        <span class="impact-label">Impact Level:</span>
+        <span class="impact-badge impact-vh">Very High</span>
+      </div>
+      <hr class="divider">
+ 
+      <div class="section-title">Typische Aufgaben</div>
+      <div class="tasks">
+        <span class="task-tag">E-Mail Nurturing</span>
+        <span class="task-tag">Retargeting</span>
+        <span class="task-tag">Webinar Follow-up</span>
+        <span class="task-tag">Lead Scoring</span>
+        <span class="task-tag">Personalisierte Landing Pages</span>
+      </div>
+ 
+      <div class="section-title">KI Use Cases &mdash; <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--color-text-secondary)">Farbe = ehrliche Einordnung</span></div>
+      <div class="use-cases">
+        <span class="uc-tag tool">E-Mail-Drafts personalisiert</span>
+        <span class="uc-tag tool">Content-Empfehlungen</span>
+        <span class="uc-tag agent">Dynamisches Lead Scoring</span>
+        <span class="uc-tag agent">Trigger-basierte Sequenzen</span>
+        <span class="uc-tag tool">Intent-Signal-Analyse</span>
+      </div>
+ 
+      <div class="section-title">Belegte Produktivitätsgewinne</div>
+      <div class="gains">
+        <div class="gain-item">
+          <div class="gain-num">20–30%</div>
+          <div class="gain-desc">bessere Conversion durch Predictive AI</div>
+          <div class="gain-src">Sopro, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">2,25 h/Tag</div>
+          <div class="gain-desc">Zeitersparnis für Sales durch KI-Unterstützung</div>
+          <div class="gain-src">Sopro Sales Research, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">71%</div>
+          <div class="gain-desc">der Konsumenten erwarten Personalisierung</div>
+          <div class="gain-src">McKinsey, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">41%</div>
+          <div class="gain-desc">höhere Conversion bei AI-optimiertem Content</div>
+          <div class="gain-src">HubSpot Research, 2025</div>
+        </div>
+      </div>
+ 
+      <hr class="divider">
+      <div class="agent-block">
+        <div class="agent-title">Was steckt wirklich dahinter?</div>
+        <div class="agent-row">
+          <span class="agent-name">HubSpot / Marketo Sequenzen</span>
+          <span class="agent-verdict av-copilot">Regelbasierte Automation</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Dynamisches Lead Scoring (Salesforce)</span>
+          <span class="agent-verdict av-auto">Agent (enger Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Predictive Intent (6sense, Demandbase)</span>
+          <span class="agent-verdict av-auto">Agent (enger Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">„Autonomes Nurturing"</span>
+          <span class="agent-verdict av-hype">Agentwashing</span>
+        </div>
+      </div>
+ 
+      <div class="confidence-block">
+        <hr class="divider">
+        <div class="section-title">Agent Confidence — Wie autonom wollen Sie delegieren?</div>
+        <div class="conf-label">Verschieben Sie den Regler: Was sollte KI allein entscheiden dürfen?</div>
+        <input type="range" min="0" max="100" value="55" oninput="updateConf(this.value, 'c-conf')">
+        <div class="conf-out" id="c-conf">55% — Empfehlung: Segmentierung autonom, Messaging mit Freigabe</div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── PURCHASE ── -->
+  <div id="purchase" class="phase" style="display:none">
+    <div class="card">
+      <div class="phase-label">Purchase</div>
+      <div class="cluster">Cluster: <strong>Sales Enablement &amp; Conversion</strong></div>
+      <div class="impact-row">
+        <span class="impact-label">Impact Level:</span>
+        <span class="impact-badge impact-h">High</span>
+      </div>
+      <hr class="divider">
+ 
+      <div class="section-title">Typische Aufgaben</div>
+      <div class="tasks">
+        <span class="task-tag">Angebotserstellung</span>
+        <span class="task-tag">Call-Zusammenfassungen</span>
+        <span class="task-tag">CRM-Updates</span>
+        <span class="task-tag">Follow-up E-Mails</span>
+        <span class="task-tag">Pricing-Empfehlungen</span>
+      </div>
+ 
+      <div class="section-title">KI Use Cases &mdash; <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--color-text-secondary)">Farbe = ehrliche Einordnung</span></div>
+      <div class="use-cases">
+        <span class="uc-tag tool">Call Summarization (Gong, Chorus)</span>
+        <span class="uc-tag tool">Proposal Draft Generation</span>
+        <span class="uc-tag agent">Automatisches CRM-Update</span>
+        <span class="uc-tag agent">Follow-up Sequenz Trigger</span>
+        <span class="uc-tag tool">Pricing Intelligence</span>
+      </div>
+ 
+      <div class="section-title">Belegte Produktivitätsgewinne</div>
+      <div class="gains">
+        <div class="gain-item">
+          <div class="gain-num">+40%</div>
+          <div class="gain-desc">Produktivitätssteigerung Sales durch KI</div>
+          <div class="gain-src">Sopro, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">−25%</div>
+          <div class="gain-desc">kürzere Sales-Cycles</div>
+          <div class="gain-src">Sopro, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">86%</div>
+          <div class="gain-desc">der Sales-Teams: positiver ROI im ersten Jahr</div>
+          <div class="gain-src">Sopro Sales Research, 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">60%</div>
+          <div class="gain-desc">der Routine-Follow-ups autonom (Agentforce)</div>
+          <div class="gain-src">Beam AI / Salesforce, 2026</div>
+        </div>
+      </div>
+ 
+      <hr class="divider">
+      <div class="agent-block">
+        <div class="agent-title">Was steckt wirklich dahinter?</div>
+        <div class="agent-row">
+          <span class="agent-name">Gong / Chorus Call Summary</span>
+          <span class="agent-verdict av-copilot">Copilot (GenAI)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Salesforce Agentforce 3.0</span>
+          <span class="agent-verdict av-auto">Agent (Salesforce-Ökosystem)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">„KI schließt Deals autonom"</span>
+          <span class="agent-verdict av-hype">Agentwashing</span>
+        </div>
+      </div>
+ 
+      <div class="confidence-block">
+        <hr class="divider">
+        <div class="section-title">Agent Confidence — Wie autonom wollen Sie delegieren?</div>
+        <div class="conf-label">Verschieben Sie den Regler: Was sollte KI allein entscheiden dürfen?</div>
+        <input type="range" min="0" max="100" value="30" oninput="updateConf(this.value, 'p-conf')">
+        <div class="conf-out" id="p-conf">30% — Empfehlung: KI vorbereitet, Mensch entscheidet und kommuniziert</div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── LOYALTY ── -->
+  <div id="loyalty" class="phase" style="display:none">
+    <div class="card">
+      <div class="phase-label">Loyalty</div>
+      <div class="cluster">Cluster: <strong>Customer Success &amp; Retention</strong></div>
+      <div class="impact-row">
+        <span class="impact-label">Impact Level:</span>
+        <span class="impact-badge impact-vh">Very High</span>
+      </div>
+      <hr class="divider">
+ 
+      <div class="section-title">Typische Aufgaben</div>
+      <div class="tasks">
+        <span class="task-tag">Support-Anfragen</span>
+        <span class="task-tag">Churn-Prognose</span>
+        <span class="task-tag">Upsell-Identifikation</span>
+        <span class="task-tag">NPS-Analyse</span>
+        <span class="task-tag">Automatische Reports</span>
+      </div>
+ 
+      <div class="section-title">KI Use Cases &mdash; <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--color-text-secondary)">Farbe = ehrliche Einordnung</span></div>
+      <div class="use-cases">
+        <span class="uc-tag agent">Conversational Support AI</span>
+        <span class="uc-tag agent">Churn Prediction Model</span>
+        <span class="uc-tag tool">Sentiment Analysis</span>
+        <span class="uc-tag tool">Automated Reporting</span>
+        <span class="uc-tag agent">Upsell-Signal Detection</span>
+      </div>
+ 
+      <div class="section-title">Belegte Produktivitätsgewinne</div>
+      <div class="gains">
+        <div class="gain-item">
+          <div class="gain-num">85%</div>
+          <div class="gain-desc">Tier-1-Support-Anfragen autonom (Agentforce)</div>
+          <div class="gain-src">Beam AI / Salesforce, 2026</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">−50%</div>
+          <div class="gain-desc">kürzere Lösungszeiten durch AI-Support</div>
+          <div class="gain-src">LoopexDigital, Q1 2026</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">34 Mrd.</div>
+          <div class="gain-desc">automatisierte Kundeninteraktionen bis 2027</div>
+          <div class="gain-src">Juniper Research, Dez. 2025</div>
+        </div>
+        <div class="gain-item">
+          <div class="gain-num">95%</div>
+          <div class="gain-desc">der Entscheider: Zeit- und Kostenersparnis durch KI</div>
+          <div class="gain-src">Salesforce Research, 2025</div>
+        </div>
+      </div>
+ 
+      <hr class="divider">
+      <div class="agent-block">
+        <div class="agent-title">Was steckt wirklich dahinter?</div>
+        <div class="agent-row">
+          <span class="agent-name">Intercom / Zendesk AI</span>
+          <span class="agent-verdict av-auto">Agent (Support-Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Talkwalker Yeti Agent</span>
+          <span class="agent-verdict av-auto">Agent (Daten-Scope)</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Churn-Modelle (Gainsight etc.)</span>
+          <span class="agent-verdict av-copilot">Predictive AI, kein Agent</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">„Vollautonomes Customer Success"</span>
+          <span class="agent-verdict av-hype">Agentwashing</span>
+        </div>
+      </div>
+ 
+      <div class="confidence-block">
+        <hr class="divider">
+        <div class="section-title">Agent Confidence — Wie autonom wollen Sie delegieren?</div>
+        <div class="conf-label">Verschieben Sie den Regler: Was sollte KI allein entscheiden dürfen?</div>
+        <input type="range" min="0" max="100" value="65" oninput="updateConf(this.value, 'l-conf')">
+        <div class="conf-out" id="l-conf">65% — Empfehlung: Standard-Support autonom, Eskalation immer zum Menschen</div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── Legend ── -->
+  <div class="legend">
+    <div class="leg-item">
+      <div class="leg-dot" style="background:#8AA9B0; border:1px solid #8AA9B0"></div>
+      Copilot / Automation (GenAI-Tool, Mensch steuert)
+    </div>
+    <div class="leg-item">
+      <div class="leg-dot" style="background:#007C91; border:1px solid #007C91"></div>
+      Echter Agent (autonomer, enger Scope, belegt)
+    </div>
+    <div class="leg-item">
+      <div class="leg-dot" style="background:#C0392B; border:1px solid #C0392B"></div>
+      Agentwashing (Buzzword ohne Substanz)
+    </div>
+  </div>
+ 
+</div><!-- /.nav -->
+ 
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.phase').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).style.display = 'block';
+    btn.classList.add('active');
+  }
+ 
+  function updateConf(v, id) {
+    v = parseInt(v);
+    let msg;
+    if (v <= 20)      msg = v + '% — Empfehlung: KI nur als Recherche-Assistent';
+    else if (v <= 40) msg = v + '% — Empfehlung: KI entwirft, Mensch genehmigt alles';
+    else if (v <= 60) msg = v + '% — Empfehlung: Routine autonom, Strategie beim Menschen';
+    else if (v <= 80) msg = v + '% — Empfehlung: Nur Brand-Safety und Budget manuell';
+    else              msg = v + '% — Risiko: Governance und Rollback-Mechanismen zwingend prüfen (Gartner)';
+    document.getElementById(id).textContent = msg;
+  }
+</script>
+ 
+</body>
+</html>
